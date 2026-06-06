@@ -1,4 +1,4 @@
-# 🚓 Projeto de Integração: Análise de Dados da PRF (2022–2024)
+# Projeto de Integração: Análise de Dados da PRF (2022–2024)
 
 [![Database: PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Tool: dbt](https://img.shields.io/badge/Transform-dbt-orange?style=for-the-badge&logo=dbt)](https://www.getdbt.com/)
@@ -11,7 +11,7 @@ O objetivo central do projeto é a concepção de um ecossistema analítico comp
 
 ---
 
-## 👥 Integrantes
+## Integrantes
 
 O desenvolvimento deste projeto foi executado colaborativamente pelo **Grupo 6**, na disciplina de *Projeto de Integração* do **Centro de Informática (CIn - UFPE)**:
 
@@ -24,7 +24,7 @@ O desenvolvimento deste projeto foi executado colaborativamente pelo **Grupo 6**
 
 ---
 
-## 🚀 Estrutura do Repositório
+## Estrutura do Repositório
 
 O projeto está estruturado de forma modular e seguindo as melhores práticas modernas da engenharia de dados:
 
@@ -52,7 +52,7 @@ O projeto está estruturado de forma modular e seguindo as melhores práticas mo
 
 ---
 
-## 📊 Arquitetura do Data Warehouse & Modelagem Dimensional
+## Arquitetura do Data Warehouse & Modelagem Dimensional
 
 Para responder perguntas analíticas de alto volume e desempenho (ex: *evolução anual de multas por região*, *correlação de excesso de velocidade por tipo de veículo*), desnormalizamos os dados relacionais em um **Esquema Estrela (Star Schema)**.
 
@@ -118,11 +118,11 @@ erDiagram
     Fato_Multa }|--|| Infrator : "Analisa o veículo / infrator"
 ```
 
-> 📖 Para uma descrição detalhada de cada atributo, tipos de dados, chaves substitutas e regras de normalização de inconsistências históricas (como a mudança de tipo do campo `Indicador Veiculo Estrangeiro` em 2024), acesse o [Dicionário de Dados Completo](file:///Users/willian/Projetos/Grupo-6-PRF/docs/modelagem_dimensional_e_dicionario_de_dados.md).
+>  Para uma descrição detalhada de cada atributo, tipos de dados, chaves substitutas e regras de normalização de inconsistências históricas (como a mudança de tipo do campo `Indicador Veiculo Estrangeiro` em 2024), acesse o [Dicionário de Dados Completo](file:///Users/willian/Projetos/Grupo-6-PRF/docs/modelagem_dimensional_e_dicionario_de_dados.md).
 
 ---
 
-## 🛠 Tecnologias e Paradigmas
+## Tecnologias e Paradigmas
 
 O projeto explora e compara ativamente dois paradigmas de ingestão de dados:
 
@@ -135,7 +135,7 @@ O projeto explora e compara ativamente dois paradigmas de ingestão de dados:
 
 ---
 
-## 📝 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### Pré-requisitos
 * Python 3.10 ou superior.
@@ -187,7 +187,7 @@ Você pode executar a transformação do ELT de duas formas alternativas:
 
 ---
 
-## 📌 Padrão de Desenvolvimento e Commits
+## Padrão de Desenvolvimento e Commits
 
 Para garantir um histórico limpo, uniforme e auditável, o grupo segue a padronização baseada em **Conventional Commits**:
 

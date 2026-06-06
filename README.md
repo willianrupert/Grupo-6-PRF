@@ -13,7 +13,7 @@ O objetivo central do projeto é a concepção de um ecossistema analítico comp
 
 ## Integrantes
 
-O desenvolvimento deste projeto foi executado colaborativamente pelo **Grupo 6**, na disciplina de *Projeto de Integração* do **Centro de Informática (CIn - UFPE)**:
+O desenvolvimento deste projeto foi executado colaborativamente pelo **Grupo 6**, na disciplina de *Banco de Dados* no *Projeto de Integração* do **Centro de Informática (CIn - UFPE)**:
 
 * Amanda Trinity
 * Mirella Laura

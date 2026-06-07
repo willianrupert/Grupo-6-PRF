@@ -1,0 +1,90 @@
+[0m15:35:27.388359 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x722375545400>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x72237814f250>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7223746c3b10>]}
+
+
+============================== 15:35:27.399977 | 3d1c2c21-5a9a-4ff2-b2e5-a899cefa4a85 ==============================
+[0m15:35:27.399977 [info ] [MainThread]: Running with dbt=1.11.11
+[0m15:35:27.401335 [debug] [MainThread]: running dbt with arguments {'profiles_dir': '/home/trinity/.dbt', 'log_path': 'logs', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'partial_parse': 'True', 'no_print': 'None', 'printer_width': '80', 'empty': 'None', 'debug': 'False', 'cache_selected_only': 'False', 'log_cache_events': 'False', 'use_colors': 'True', 'invocation_command': 'dbt init Grupo-6-PRF', 'fail_fast': 'False', 'log_format': 'default', 'indirect_selection': 'eager', 'write_json': 'True', 'quiet': 'False', 'warn_error': 'None', 'introspect': 'True', 'use_experimental_parser': 'False', 'send_anonymous_usage_stats': 'True', 'target_path': 'None', 'static_parser': 'True', 'version_check': 'True'}
+[0m15:35:27.423568 [info ] [MainThread]: Creating dbt configuration folder at /home/trinity/.dbt
+[0m15:35:38.853729 [debug] [MainThread]: Starter project path: /home/trinity/.pyenv/versions/3.13.7/lib/python3.13/site-packages/dbt/include/starter_project
+[0m15:35:38.867974 [info ] [MainThread]: 
+Your new dbt project "prf" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m15:35:38.869722 [info ] [MainThread]: Setting up your profile.
+[0m15:38:41.226950 [info ] [MainThread]: Profile prf written to /home/trinity/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m15:38:41.233826 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 193.91452, "process_in_blocks": "15608", "process_kernel_time": 0.1597, "process_mem_max_rss": "105084", "process_out_blocks": "88", "process_user_time": 2.159949}
+[0m15:38:41.234930 [debug] [MainThread]: Command `dbt init` succeeded at 15:38:41.234725 after 193.92 seconds
+[0m15:38:41.235593 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x722373b5d0f0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x722376bf3890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x722373b485a0>]}
+[0m15:38:41.236421 [debug] [MainThread]: Flushing usage events
+[0m15:38:42.280820 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:40:13.440669 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78b06cd400>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78b331f250>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78af687b10>]}
+
+
+============================== 15:40:13.446155 | 48e8b5c5-ad19-4a09-9ce6-14b87d0baf02 ==============================
+[0m15:40:13.446155 [info ] [MainThread]: Running with dbt=1.11.11
+[0m15:40:13.447430 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'log_format': 'default', 'warn_error': 'None', 'fail_fast': 'False', 'static_parser': 'True', 'log_path': 'logs', 'cache_selected_only': 'False', 'send_anonymous_usage_stats': 'True', 'write_json': 'True', 'use_colors': 'True', 'log_cache_events': 'False', 'invocation_command': 'dbt debug', 'empty': 'None', 'introspect': 'True', 'partial_parse': 'True', 'target_path': 'None', 'no_print': 'None', 'indirect_selection': 'eager', 'version_check': 'True', 'quiet': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'profiles_dir': '/home/trinity/.dbt', 'use_experimental_parser': 'False', 'debug': 'False'}
+[0m15:40:13.464547 [info ] [MainThread]: dbt version: 1.11.11
+[0m15:40:13.465094 [info ] [MainThread]: python version: 3.13.7
+[0m15:40:13.465491 [info ] [MainThread]: python path: /home/trinity/.pyenv/versions/3.13.7/bin/python3.13
+[0m15:40:13.465880 [info ] [MainThread]: os info: Linux-6.8.0-124-generic-x86_64-with-glibc2.35
+[0m15:40:13.531840 [info ] [MainThread]: Using profiles dir at /home/trinity/.dbt
+[0m15:40:13.532379 [info ] [MainThread]: Using profiles.yml file at /home/trinity/.dbt/profiles.yml
+[0m15:40:13.532669 [info ] [MainThread]: Using dbt_project.yml file at /home/trinity/Grupo-6-PRF/dbt_project.yml
+[0m15:40:13.535747 [info ] [MainThread]: adapter type: postgres
+[0m15:40:13.536061 [info ] [MainThread]: adapter version: 1.10.0
+[0m15:40:13.536343 [info ] [MainThread]: Configuration:
+[0m15:40:13.536629 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m15:40:13.536907 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m15:40:13.537199 [info ] [MainThread]: Required dependencies:
+[0m15:40:13.537636 [debug] [MainThread]: Executing "git --help"
+[0m15:40:13.540286 [debug] [MainThread]: STDOUT: "b"usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           [--super-prefix=<path>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone     Clone a repository into a new directory\n   init      Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add       Add file contents to the index\n   mv        Move or rename a file, a directory, or a symlink\n   restore   Restore working tree files\n   rm        Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect    Use binary search to find the commit that introduced a bug\n   diff      Show changes between commits, commit and working tree, etc\n   grep      Print lines matching a pattern\n   log       Show commit logs\n   show      Show various types of objects\n   status    Show the working tree status\n\ngrow, mark and tweak your common history\n   branch    List, create, or delete branches\n   commit    Record changes to the repository\n   merge     Join two or more development histories together\n   rebase    Reapply commits on top of another base tip\n   reset     Reset current HEAD to the specified state\n   switch    Switch branches\n   tag       Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch     Download objects and refs from another repository\n   pull      Fetch from and integrate with another repository or a local branch\n   push      Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:40:13.541240 [debug] [MainThread]: STDERR: "b''"
+[0m15:40:13.541928 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:40:13.542554 [info ] [MainThread]: Connection:
+[0m15:40:13.543150 [info ] [MainThread]:   host: db.rlight.com.br
+[0m15:40:13.543830 [info ] [MainThread]:   port: 5432
+[0m15:40:13.544472 [info ] [MainThread]:   user: prf_user
+[0m15:40:13.545207 [info ] [MainThread]:   database: prf_multas
+[0m15:40:13.545940 [info ] [MainThread]:   schema: public
+[0m15:40:13.546673 [info ] [MainThread]:   connect_timeout: 10
+[0m15:40:13.547407 [info ] [MainThread]:   role: None
+[0m15:40:13.548204 [info ] [MainThread]:   search_path: None
+[0m15:40:13.549119 [info ] [MainThread]:   keepalives_idle: 0
+[0m15:40:13.550242 [info ] [MainThread]:   sslmode: None
+[0m15:40:13.551312 [info ] [MainThread]:   sslcert: None
+[0m15:40:13.552097 [info ] [MainThread]:   sslkey: None
+[0m15:40:13.552793 [info ] [MainThread]:   sslrootcert: None
+[0m15:40:13.553524 [info ] [MainThread]:   application_name: dbt
+[0m15:40:13.554509 [info ] [MainThread]:   retries: 1
+[0m15:40:13.556122 [info ] [MainThread]: Registered adapter: postgres=1.10.0
+[0m15:40:13.659174 [debug] [MainThread]: Acquiring new postgres connection 'debug'
+[0m15:40:13.688606 [debug] [MainThread]: Using postgres connection "debug"
+[0m15:40:13.688980 [debug] [MainThread]: On debug: select 1 as id
+[0m15:40:13.689318 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m15:40:14.852941 [debug] [MainThread]: SQL status: SELECT 1 in 1.163 seconds
+[0m15:40:14.862108 [debug] [MainThread]: On debug: Close
+[0m15:40:14.869152 [info ] [MainThread]:   Connection test: [[32mOK connection ok[0m]
+
+[0m15:40:14.873844 [info ] [MainThread]: [31m1 check failed:[0m
+[0m15:40:14.880744 [info ] [MainThread]: Project loading failed for the following reason:
+ project path </home/trinity/Grupo-6-PRF/dbt_project.yml> not found
+
+[0m15:40:14.894678 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": false, "command_wall_clock_time": 1.5674746, "process_in_blocks": "11120", "process_kernel_time": 0.141543, "process_mem_max_rss": "115600", "process_out_blocks": "32", "process_user_time": 1.741386}
+[0m15:40:14.898566 [debug] [MainThread]: Command `dbt debug` failed at 15:40:14.897617 after 1.58 seconds
+[0m15:40:14.901625 [debug] [MainThread]: Connection 'debug' was properly closed.
+[0m15:40:14.904127 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78af5a76f0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78adfd4050>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f78af5b07c0>]}
+[0m15:40:14.907243 [debug] [MainThread]: Flushing usage events
+[0m15:40:15.777231 [debug] [MainThread]: An error was encountered while trying to flush usage events

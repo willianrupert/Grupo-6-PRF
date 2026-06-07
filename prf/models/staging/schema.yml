@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: prf_raw_data
+    database: prf_multas # O nome do nosso banco
+    schema: public
+    tables:
+      - name: raw_multas # tabela que o Python alimentou
+
+# Para que isso?
+# Resposta: a gente n precisa mais escrever o nome fixo da tabela bruta nos nossos códigos sql
+# ex em vez de escrever from public raw_multas, podemos escrever
+#{{ source('prf_raw_data', 'raw_multas') }}
+# isso ajuda tbm o dbt a ter uma melhor uma rastreabilidade

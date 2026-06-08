@@ -1,14 +1,201 @@
 version: 2
 
+# =============================================================================
+# SOURCES — Tabela bruta carregada pelo ETL Python
+# =============================================================================
 sources:
   - name: prf_raw_data
-    database: prf_multas # O nome do nosso banco
+    database: prf_multas          # Nome do banco no PostgreSQL
     schema: public
     tables:
-      - name: raw_multas # tabela que o Python alimentou
+      - name: raw_multas           # Tabela que o Python alimenta
+        description: >
+          Tabela bruta com todas as multas da PRF unificadas, carregada pelo
+          script ETL (notebooks/ETL_prf_multas.ipynb). É a única fonte de
+          verdade antes de qualquer transformação.
 
-# Para que isso?
-# Resposta: a gente n precisa mais escrever o nome fixo da tabela bruta nos nossos códigos sql
-# ex em vez de escrever from public raw_multas, podemos escrever
-#{{ source('prf_raw_data', 'raw_multas') }}
-# isso ajuda tbm o dbt a ter uma melhor uma rastreabilidade
+# =============================================================================
+# MODELS — Camada Staging
+# =============================================================================
+models:
+  - name: stg_multas_unificados
+    description: >
+      View simples sobre a tabela bruta raw_multas. Serve como ponto único de
+      referência para a camada intermediária, facilitando rastreabilidade no
+      lineage graph do dbt.
+    columns:
+      - name: numero_auto
+        description: Identificador único do auto de infração.
+        tests:
+          - not_null
+
+# =============================================================================
+# MODELS — Camada Intermediária (int_)
+# =============================================================================
+  - name: int_multas_preparados
+    description: >
+      Camada de preparação que aplica limpeza, padronização de strings,
+      tratamento de nulos e normalização de campos antes de explodir nos
+      modelos de fato e dimensão.
+    columns:
+      - name: numero_auto
+        description: Identificador único do auto de infração.
+        tests:
+          - not_null
+          - unique
+
+# =============================================================================
+# MODELS — Camada Marts (Star Schema)
+# =============================================================================
+  - name: fato_multa_dbt
+    description: >
+      Tabela fato central do Star Schema. Cada linha representa um evento de
+      infração (multa) com suas chaves estrangeiras para as dimensões de tempo,
+      localização, infração e veículo, além das medidas e atributos da multa.
+    columns:
+      - name: numero_auto
+        description: Chave natural da multa (identificador do auto de infração).
+        tests:
+          - not_null
+          - unique
+      - name: id_tempo_sk
+        description: Chave surrogate da dimensão tempo.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tempo_dbt')
+              field: id_tempo_sk
+      - name: id_localidade_sk
+        description: Chave surrogate da dimensão localização.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localizacao_dbt')
+              field: id_localidade_sk
+      - name: id_infracao_sk
+        description: Chave surrogate da dimensão infração.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_infracao_dbt')
+              field: id_infracao_sk
+      - name: id_veiculo_sk
+        description: Chave surrogate da dimensão veículo.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_veiculo_dbt')
+              field: id_veiculo_sk
+
+  - name: dim_infracao_dbt
+    description: >
+      Dimensão com o catálogo das infrações de trânsito. Cada linha representa
+      um tipo único de infração com seu código, descrição, enquadramento legal
+      e gravidade classificada automaticamente.
+    columns:
+      - name: id_infracao_sk
+        description: Chave surrogate sequencial da dimensão infração.
+        tests:
+          - not_null
+          - unique
+      - name: codigo_infracao
+        description: Código oficial da infração conforme CTB.
+        tests:
+          - not_null
+          - unique
+      - name: descricao_infracao
+        description: Descrição abreviada da infração.
+        tests:
+          - not_null
+      - name: gravidade
+        description: >
+          Gravidade derivada do texto do enquadramento:
+          Gravíssima | Grave | Média | Leve | Não classificada.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Gravíssima', 'Grave', 'Média', 'Leve', 'Não classificada']
+
+  - name: dim_localizacao_dbt
+    description: >
+      Dimensão com os municípios e UFs onde as infrações ocorreram.
+      Cada combinação município + UF é única.
+    columns:
+      - name: id_localidade_sk
+        description: Chave surrogate sequencial da dimensão localização.
+        tests:
+          - not_null
+          - unique
+      - name: municipio
+        description: Nome do município da infração.
+        tests:
+          - not_null
+      - name: uf
+        description: Sigla do estado (UF) da infração.
+        tests:
+          - not_null
+
+  - name: dim_tempo_dbt
+    description: >
+      Dimensão calendário com atributos temporais derivados da data da infração:
+      dia, mês, ano, trimestre, dia da semana e flag de feriado nacional.
+    columns:
+      - name: id_tempo_sk
+        description: Chave surrogate sequencial da dimensão tempo.
+        tests:
+          - not_null
+          - unique
+      - name: data_infracao
+        description: Data da infração (granularidade diária).
+        tests:
+          - not_null
+          - unique
+      - name: ano
+        description: Ano da infração extraído da data.
+        tests:
+          - not_null
+      - name: mes
+        description: Mês da infração (1–12).
+        tests:
+          - not_null
+      - name: trimestre
+        description: Trimestre do ano (1–4).
+        tests:
+          - not_null
+      - name: dia_semana
+        description: Nome do dia da semana em português.
+        tests:
+          - not_null
+      - name: is_feriado
+        description: >
+          TRUE quando a data é feriado nacional fixo ou móvel (cobre 2022–2024).
+        tests:
+          - not_null
+
+  - name: dim_veiculo_dbt
+    description: >
+      Dimensão com o perfil dos veículos envolvidos nas infrações:
+      espécie, tipo, marca, modelo, tipo de abordagem, placa estrangeira e UF da placa.
+    columns:
+      - name: id_veiculo_sk
+        description: Chave surrogate sequencial da dimensão veículo.
+        tests:
+          - not_null
+          - unique
+      - name: especie_veiculo
+        description: "Espécie do veículo (ex.: Automóvel, Motocicleta, Caminhão)."
+        tests:
+          - not_null
+      - name: tipo_veiculo
+        description: Tipo do veículo conforme categorização do DETRAN/DENATRAN.
+        tests:
+          - not_null
+      - name: tipo_abordagem
+        description: >
+          Forma como a infração foi detectada:
+          Abordagem presencial | Equipamento eletrônico | Denúncia | Não informado.
+        tests:
+          - accepted_values:
+              values: ['Abordagem presencial', 'Equipamento eletrônico', 'Denúncia', 'Não informado']
+      - name: indicador_veiculo_estrangeiro
+        description: "Indica se o veículo tem placa estrangeira - S (Sim) ou N (Nao)."

@@ -7,7 +7,7 @@
 
 -- nosso modelo de staging
 with stg_multas AS (
-        SELECT * FROM {{ ref('int_multas_unificados') }}
+        SELECT * FROM {{ ref('stg_multas_unificados') }}
     ),
 
 -- CAMPOS VAZIOS E NORMALIZAÇÕES INICIAIS
@@ -96,9 +96,18 @@ conversao_tipos AS (
         CAST(REPLACE(COALESCE(medicao_considerada, '0'), ',', '.') AS NUMERIC(10,2)) AS medicao_considerada,
         CAST(REPLACE(COALESCE(excesso_verificado, '0'), ',', '.') AS NUMERIC(10,2)) AS excesso_verificado,
 
-        -- Datas
-        CAST(data_infracao AS DATE) AS data_infracao,
-        CAST(inicio_vigencia_infracao AS DATE) AS inicio_vigencia_infracao
+        -- Implementação de limpeza rigorosa de dados com regex (~ '^\d{4}-\d{2}-\d{2}$') para converter datas, 
+        -- tratando casos como "N/I" e evitando erros de tipo (CAST).
+        -- Só converte se for uma data válida, caso contrário vira NULL (evita erro de N/I)
+        CASE 
+            WHEN data_infracao ~ '^\d{4}-\d{2}-\d{2}$' THEN data_infracao::DATE 
+            ELSE NULL 
+        END AS data_infracao,
+        
+        CASE 
+            WHEN inicio_vigencia_infracao ~ '^\d{4}-\d{2}-\d{2}$' THEN inicio_vigencia_infracao::DATE 
+            ELSE NULL 
+        END AS inicio_vigencia_infracao
     FROM
         normalizacao_placa
 ),

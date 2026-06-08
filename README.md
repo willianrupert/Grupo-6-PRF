@@ -44,8 +44,8 @@ O projeto está estruturado de forma modular e seguindo as melhores práticas mo
 |   |       ├── dim_localizacao_dbt.sql 
 |   |       ├── dim_tempo_dbt.sql 
 |   |       ├── dim_veiculo_dbt.sql 
-|   |       ├── fato_multa.sql 
-|   |       └── int_multas_preparados.sql # # Limpeza intermediária
+|   |       ├── fato_multa_dbt.sql 
+|   |       └── int_multas_preparados.sql # Limpeza intermediária
 │   ├── dbt_project.yml            # Configuração geral do projeto dbt
 │   └── packages.yml               # Dependências do dbt
 │

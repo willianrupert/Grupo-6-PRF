@@ -37,14 +37,26 @@ O projeto está estruturado de forma modular e seguindo as melhores práticas mo
 ├── transformacao_prf/             # Projeto dbt para transformações de dados no banco (alternativa de ELT)
 │   ├── models/
 │   │   ├── staging/               # Limpeza, padronização e tipagem (Luz sobre dados brutos)
+|   |   |   ├── schema.yml         #  Estrutura lógica que define como os dados são organizados, armazenados e relacionados
+|   |   |   └── stg_vacinados_unificados.sql 
 │   │   └── marts/                 # Modelos dimensionais finais (Fato e Dimensões)
+|   |       ├── dim_infracao_dbt.sql 
+|   |       ├── dim_localizacao_dbt.sql 
+|   |       ├── dim_tempo_dbt.sql 
+|   |       ├── dim_veiculo_dbt.sql 
+|   |       ├── fato_multa_dbt.sql 
+|   |       └── int_multas_preparados.sql # Limpeza intermediária
 │   ├── dbt_project.yml            # Configuração geral do projeto dbt
 │   └── packages.yml               # Dependências do dbt
 │
 ├── docs/                          # Documentação técnica de apoio
-│   └── modelagem_dimensional_e_dicionario_de_dados.md # Dicionário de variáveis e regras de negócio
+│   ├── modelagem_dimensional_e_dicionario_de_dados.md # Dicionário de variáveis e regras de negócio
+|   └── Relatório Final.pdf        # Documento do relatório final do projeto
 │
 ├── analysis/                      # Análises estatísticas, visualizações e relatórios
+|   ├── 01_evolucao_anual_por_regiao.sql
+|   ├── 02_perfil_por_infracao.sql
+|   ├── 03_infracoes_por_gravidade.sql
 │   └── .gitkeep
 │
 └── README.md                      # Documento principal de apresentação
@@ -132,6 +144,16 @@ O projeto explora e compara ativamente dois paradigmas de ingestão de dados:
 * **Banco de Dados**: PostgreSQL (Hospedado na nuvem via Neon).
 * **Processamento**: SQLAlchemy, PyArrow, Pandas.
 * **Orquestração de T.:** dbt Core.
+
+---
+## Análises Realizadas
+O projeto culmina na extração de insights estratégicos sobre a segurança viária nas rodovias federais:
+
+1. **Variação Regional de Infrações**: Análise de crescimento/queda de multas por região com cálculo de variação percentual anual.
+2. **Perfil dos Veículos**: Investigação de quais tipos de veículos apresentam maiores médias de excesso de velocidade, incluindo a flag de estrangeiridade.
+3. **Gravidade das Infrações**: Levantamento das infrações mais frequentes, cruzando gravidade (Grave/Gravíssima) com a média de velocidade excedida.
+
+As queries detalhadas destas análises estão disponíveis na pasta `/analysis`.
 
 ---
 

@@ -7,9 +7,10 @@
 
 -- nosso modelo de staging
 with stg_multas AS (
-        SELECT * FROM {{ ref('stg_multas_unificados') }}
+        SELECT * FROM {{ ref('int_multas_unificados') }}
     ),
--- CAMPOS VAZIOS
+
+-- CAMPOS VAZIOS E NORMALIZAÇÕES INICIAIS
 normalizacao_estrangeiro_e_nulos AS (
 SELECT
     *,
@@ -61,7 +62,7 @@ normalizacao_placa AS (
         uf_placa != '/'
 ),
 
--- conversão de tipos numéricos
+-- conversão correta de tipos numéricos e decimais
 conversao_tipos AS (
     SELECT
         numero_auto,
@@ -81,19 +82,22 @@ conversao_tipos AS (
         
         COALESCE(br_infracao, 'N/I') AS br_infracao,
         COALESCE(codigo_infracao, 'N/I') AS codigo_infracao,
+        
+        COALESCE(medicao_infracao, 'N/I') AS medicao_infracao, -- mantido como VARCHAR/Texto por segurança ("Alcoolemia", etc.)
+
         -- OBS: CAST é uma função[SQL] utilizada para converter o tipo de dado de uma coluna ou valor em outro tipo
         -- preenchendo nulos com 0
+        -- inteiros puros
         CAST(COALESCE(km_infracao, '0') AS INTEGER) AS km_infracao,
-        CAST(COALESCE(medicao_infracao, '0') AS INTEGER) AS medicao_infracao,
-        CAST(COALESCE(medicao_considerada, '0') AS INTEGER) AS medicao_considerada,
-        CAST(COALESCE(excesso_verificado, '0') AS INTEGER) AS excesso_verificado,
-        CAST(COALESCE(qtd_infracoes, '1') AS INTEGER) AS qtd_infracoes, -- qtd_infracoes com default 1
-
-        -- Manipulação segura de datas
-        CAST(data_infracao AS DATE) AS data_infracao,
+        CAST(COALESCE(qtd_infracoes, '1') AS INTEGER) AS qtd_infracoes, 
         CAST(hora_infracao AS INTEGER) AS hora_infracao,
 
-        -- A coluna 'fim_vigencia_infracao' foi dropada
+        -- substituição da vírgula por ponto antes do CAST para FLOAT/NUMERIC
+        CAST(REPLACE(COALESCE(medicao_considerada, '0'), ',', '.') AS NUMERIC(10,2)) AS medicao_considerada,
+        CAST(REPLACE(COALESCE(excesso_verificado, '0'), ',', '.') AS NUMERIC(10,2)) AS excesso_verificado,
+
+        -- Datas
+        CAST(data_infracao AS DATE) AS data_infracao,
         CAST(inicio_vigencia_infracao AS DATE) AS inicio_vigencia_infracao
     FROM
         normalizacao_placa

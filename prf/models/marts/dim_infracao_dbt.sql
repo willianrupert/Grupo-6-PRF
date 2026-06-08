@@ -1,16 +1,16 @@
 {{ config(materialized='table') }}
 
+
+-- Otimização de performance usando GROUP BY em vez de DISTINCT ON para evitar timeout/SSL EOF.
 WITH base AS (
-    -- DISTINCT ON (codigo): pega 1 linha por código de infração
-    -- (o mesmo código sempre carrega a mesma descrição e enquadramento)
-    SELECT DISTINCT ON (codigo_infracao)
+    SELECT
         codigo_infracao,
-        descricao_abreviada_infracao,
-        enquadramento_infracao,
-        inicio_vigencia_infracao
+        MAX(descricao_abreviada_infracao) as descricao_abreviada_infracao,
+        MAX(enquadramento_infracao) as enquadramento_infracao,
+        MAX(inicio_vigencia_infracao) as inicio_vigencia_infracao
     FROM {{ ref('int_multas_preparados') }}
     WHERE codigo_infracao <> 'N/I'
-    ORDER BY codigo_infracao
+    GROUP BY codigo_infracao
 )
 
 SELECT

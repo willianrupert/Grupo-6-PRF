@@ -7,7 +7,7 @@
 
 -- nosso modelo de staging
 with stg_multas AS (
-        SELECT * FROM {{ ref('int_multas_unificados') }}
+        SELECT * FROM {{ ref('stg_multas_unificados') }}
     ),
 
 -- CAMPOS VAZIOS E NORMALIZAÇÕES INICIAIS

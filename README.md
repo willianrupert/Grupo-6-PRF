@@ -34,7 +34,7 @@ O projeto está estruturado de forma modular e seguindo as melhores práticas mo
 │   ├── ELT_transformacao_prf_multas.ipynb # ELT - Fase T: Transformações dimensionais via SQL puro
 │   └── ETL_prf_multas.ipynb       # ETL completo: Extração, Transformação via Pandas e Carga final
 │
-├── transformacao_prf/             # Projeto dbt para transformações de dados no banco (alternativa de ELT)
+├── transformacao_infracoes/             # Projeto dbt para transformações de dados no banco (alternativa de ELT)
 │   ├── models/
 │   │   ├── staging/               # Limpeza, padronização e tipagem (Luz sobre dados brutos)
 |   |   |   ├── schema.yml         #  Estrutura lógica que define como os dados são organizados, armazenados e relacionados

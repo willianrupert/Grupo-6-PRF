@@ -59,5 +59,33 @@ SELECT
         WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 31 THEN TRUE
         WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 30 THEN TRUE
         ELSE FALSE
-    END AS is_feriado
+    END AS is_feriado,
+
+    CASE 
+        -- Feriados Fixos
+        WHEN EXTRACT(MONTH FROM data_infracao) = 1 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Confraternização Universal'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 21 THEN 'Tiradentes'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Dia do Trabalhador'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 9 AND EXTRACT(DAY FROM data_infracao) = 7 THEN 'Independência do Brasil'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 10 AND EXTRACT(DAY FROM data_infracao) = 12 THEN 'Nossa Senhora Aparecida'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 2 THEN 'Finados'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 15 THEN 'Proclamação da República'
+        WHEN EXTRACT(MONTH FROM data_infracao) = 12 AND EXTRACT(DAY FROM data_infracao) = 25 THEN 'Natal'
+        -- Feriados Móveis 2022
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Carnaval'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 15 THEN 'Sexta-feira Santa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 17 THEN 'Páscoa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 16 THEN 'Corpus Christi'
+        -- Feriados Móveis 2023
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 21 THEN 'Carnaval'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 7 THEN 'Sexta-feira Santa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 9 THEN 'Páscoa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 8 THEN 'Corpus Christi'
+        -- Feriados Móveis 2024
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 13 THEN 'Carnaval'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 29 THEN 'Sexta-feira Santa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 31 THEN 'Páscoa'
+        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 30 THEN 'Corpus Christi'
+        ELSE 'Não Feriado'
+    END AS nome_feriado
 FROM base

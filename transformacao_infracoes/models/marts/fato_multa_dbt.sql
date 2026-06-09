@@ -21,7 +21,7 @@ fato AS (
         s.qtd_infracoes,
         s.medicao_considerada,
         s.excesso_verificado,
-        s.assinatura_do_auto,
+        s.assinatura_auto,
         s.sentido_trafego
 
     FROM source s

@@ -1,4 +1,4 @@
-{{ config(materialized='table') }}
+{{ config(materialized='view') }}
 
 WITH source AS (
     -- Puxa os dados da tabela intermediária já limpa

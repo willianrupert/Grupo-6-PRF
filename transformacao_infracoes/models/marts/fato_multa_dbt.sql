@@ -44,6 +44,8 @@ fato as (
         and s.descricao_marca_veiculo = inf_sk.descricao_marca_veiculo
         and s.descricao_tipo_veiculo = inf_sk.descricao_tipo_veiculo
         and s.descricao_modelo_veiculo = inf_sk.descricao_modelo_veiculo
+        and s.indicador_abordagem = inf_sk.indicador_abordagem
+        and s.assinatura_auto = inf_sk.assinatura_auto
 )
 
 select * from fato

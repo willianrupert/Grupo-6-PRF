@@ -103,7 +103,7 @@ conversao_tipos as (
 
         -- Função clean_marca_veiculo em lote SQL unificada (removida a duplicata de baixo)
         case 
-            when upper(trim(marca_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', "'-1", 'Não INFORMADO') then 'NÃO INFORMADO'
+            when upper(trim(marca_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1''', 'Não INFORMADO') then 'NÃO INFORMADO'
             else upper(trim(marca_limpa))
         end as descricao_marca_veiculo,
 

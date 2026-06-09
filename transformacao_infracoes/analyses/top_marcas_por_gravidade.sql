@@ -7,41 +7,34 @@
 
 WITH ranking AS (
     SELECT
-        veic.marca_veiculo,
-        veic.modelo_veiculo,
-        inf.gravidade,
+        veic.descricao_marca_veiculo,
+        veic.descricao_modelo_veiculo,
 
         COUNT(fato.numero_auto)  AS total_multas,
 
         ROW_NUMBER() OVER (
-            PARTITION BY inf.gravidade
             ORDER BY COUNT(fato.numero_auto) DESC
-        ) AS rank_por_gravidade
+        ) AS rank_geral
 
     FROM {{ ref('fato_multa_dbt') }} AS fato
     INNER JOIN {{ ref('dim_infrator_dbt') }} AS veic
         ON fato.id_infrator_sk = veic.id_infrator_sk
-    INNER JOIN {{ ref('dim_infracao_dbt') }} AS inf
-        ON fato.id_infracao_sk = inf.id_infracao_sk
 
-    WHERE veic.marca_veiculo IS NOT NULL
+    WHERE veic.descricao_marca_veiculo IS NOT NULL AND veic.descricao_marca_veiculo != 'NÃO INFORMADO'
 
     GROUP BY
-        veic.marca_veiculo,
-        veic.modelo_veiculo,
-        inf.gravidade
+        veic.descricao_marca_veiculo,
+        veic.descricao_modelo_veiculo
 )
 
 SELECT
-    gravidade,
-    rank_por_gravidade  AS ranking,
-    marca_veiculo,
-    modelo_veiculo,
+    rank_geral  AS ranking,
+    descricao_marca_veiculo,
+    descricao_modelo_veiculo,
     total_multas
 
 FROM ranking
-WHERE rank_por_gravidade <= 10
+WHERE rank_geral <= 10
 
 ORDER BY
-    gravidade,
-    rank_por_gravidade
+    rank_geral

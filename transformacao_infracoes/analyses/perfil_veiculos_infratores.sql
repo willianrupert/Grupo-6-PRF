@@ -5,9 +5,9 @@
 -- =============================================================================
 
 SELECT
-    veic.especie_veiculo,
-    veic.tipo_veiculo,
-    veic.tipo_abordagem,
+    veic.descricao_especie_veiculo,
+    veic.descricao_tipo_veiculo,
+    veic.indicador_abordagem,
 
     -- Veículos estrangeiros têm padrão diferente?
     veic.indicador_veiculo_estrangeiro,
@@ -23,9 +23,9 @@ INNER JOIN {{ ref('dim_infrator_dbt') }} AS veic
     ON fato.id_infrator_sk = veic.id_infrator_sk
 
 GROUP BY
-    veic.especie_veiculo,
-    veic.tipo_veiculo,
-    veic.tipo_abordagem,
+    veic.descricao_especie_veiculo,
+    veic.descricao_tipo_veiculo,
+    veic.indicador_abordagem,
     veic.indicador_veiculo_estrangeiro
 
 ORDER BY total_multas DESC

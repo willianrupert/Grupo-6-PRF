@@ -22,7 +22,7 @@ INNER JOIN {{ ref('dim_infracao_dbt') }} AS inf
 
 GROUP BY
     tempo.is_feriado,
-    tempo.dia_semana,
+    tempo.dia_semana
 
 ORDER BY
     tempo.is_feriado DESC,

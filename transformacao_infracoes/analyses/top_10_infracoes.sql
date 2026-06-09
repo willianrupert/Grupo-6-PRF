@@ -6,8 +6,7 @@
 
 SELECT
     inf.codigo_infracao,
-    inf.descricao_infracao,
-    inf.gravidade,
+    inf.descricao_abreviada_infracao,
     inf.enquadramento_infracao,
 
     COUNT(fato.numero_auto)                                          AS total_multas,
@@ -22,8 +21,7 @@ INNER JOIN {{ ref('dim_infracao_dbt') }} AS inf
 
 GROUP BY
     inf.codigo_infracao,
-    inf.descricao_infracao,
-    inf.gravidade,
+    inf.descricao_abreviada_infracao,
     inf.enquadramento_infracao
 
 ORDER BY total_multas DESC

@@ -1,7 +1,7 @@
 -- Como o volume de infrações variou em cada região do país?
 SELECT
     t.ano,
-    CASE l."uf infração"
+    CASE l.uf_infracao
         WHEN 'AC' THEN 'Norte'
         WHEN 'AM' THEN 'Norte'
         WHEN 'AP' THEN 'Norte'
@@ -32,18 +32,18 @@ SELECT
         ELSE 'Não identificado'
     END AS regiao,
     COUNT(*) AS total_autos,
-    SUM(f."qtd infrações") AS total_infracoes,
+    SUM(f.qtd_infracoes) AS total_infracoes,
     ROUND(
         100.0 * (
-            SUM(f."qtd infrações") -
-            LAG(SUM(f."qtd infrações")) OVER (PARTITION BY l."uf infração" ORDER BY t.ano)
+            SUM(f.qtd_infracoes) -
+            LAG(SUM(f.qtd_infracoes)) OVER (PARTITION BY l.uf_infracao ORDER BY t.ano)
         ) / NULLIF(
-            LAG(SUM(f."qtd infrações")) OVER (PARTITION BY l."uf infração" ORDER BY t.ano)
+            LAG(SUM(f.qtd_infracoes)) OVER (PARTITION BY l.uf_infracao ORDER BY t.ano)
         , 0),
     2) AS variacao_pct_ano_anterior
 FROM fato_multa f
 JOIN dim_tempo t ON t.id_tempo_sk = f.id_tempo_sk
 JOIN dim_localizacao l ON l.id_localizacao_sk = f.id_localizacao_sk
-WHERE l."uf infração" NOT IN ('N/I', 'EX')
-GROUP BY t.ano, l."uf infração"
+WHERE l.uf_infracao NOT IN ('N/I', 'EX')
+GROUP BY t.ano, l.uf_infracao
 ORDER BY regiao, t.ano;

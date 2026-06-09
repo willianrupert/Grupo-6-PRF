@@ -19,8 +19,8 @@ WITH ranking AS (
         ) AS rank_por_gravidade
 
     FROM {{ ref('fato_multa_dbt') }} AS fato
-    INNER JOIN {{ ref('dim_veiculo_dbt') }} AS veic
-        ON fato.id_veiculo_sk = veic.id_veiculo_sk
+    INNER JOIN {{ ref('dim_infrator_dbt') }} AS veic
+        ON fato.id_infrator_sk = veic.id_infrator_sk
     INNER JOIN {{ ref('dim_infracao_dbt') }} AS inf
         ON fato.id_infracao_sk = inf.id_infracao_sk
 

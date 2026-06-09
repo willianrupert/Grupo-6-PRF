@@ -1,35 +1,17 @@
 {{ config(materialized='table') }}
 
-
--- Otimização de performance usando GROUP BY em vez de DISTINCT ON para evitar timeout/SSL EOF.
-WITH base AS (
-    SELECT
+with base as (
+    select
         codigo_infracao,
-        MAX(descricao_abreviada_infracao) as descricao_abreviada_infracao,
-        MAX(enquadramento_infracao) as enquadramento_infracao,
-        MAX(inicio_vigencia_infracao) as inicio_vigencia_infracao
-    FROM {{ ref('int_multas_preparados') }}
-    WHERE codigo_infracao <> 'N/I'
-    GROUP BY codigo_infracao
+        max(descricao_abreviada_infracao) as descricao_abreviada_infracao,
+        max(enquadramento_infracao) as enquadramento_infracao
+    from {{ ref('int_multas_preparados') }}
+    group BY codigo_infracao
 )
 
-SELECT
-    ROW_NUMBER() OVER (ORDER BY codigo_infracao) AS id_infracao_sk,
-
+select
+    row_number() over (order by codigo_infracao) as id_infracao_sk,
     codigo_infracao,
-    descricao_abreviada_infracao AS descricao_infracao,
-    enquadramento_infracao,
-
-    -- gravidade derivada do texto do enquadramento (classificação do CTB)
-    CASE
-        WHEN UPPER(enquadramento_infracao) LIKE '%GRAVISSIMA%'
-          OR UPPER(enquadramento_infracao) LIKE '%GRAVÍSSIMA%' THEN 'Gravíssima'
-        WHEN UPPER(enquadramento_infracao) LIKE '%GRAVE%'      THEN 'Grave'
-        WHEN UPPER(enquadramento_infracao) LIKE '%MEDIA%'
-          OR UPPER(enquadramento_infracao) LIKE '%MÉDIA%'      THEN 'Média'
-        WHEN UPPER(enquadramento_infracao) LIKE '%LEVE%'       THEN 'Leve'
-        ELSE 'Não classificada'
-    END AS gravidade,
-
-    inicio_vigencia_infracao AS inicio_vigencia
-FROM base
+    descricao_abreviada_infracao as descricao_infracao,
+    enquadramento_infracao
+from base

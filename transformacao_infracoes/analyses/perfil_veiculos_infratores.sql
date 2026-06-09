@@ -19,8 +19,8 @@ SELECT
     , 2)                                                             AS pct_do_total
 
 FROM {{ ref('fato_multa_dbt') }} AS fato
-INNER JOIN {{ ref('dim_veiculo_dbt') }} AS veic
-    ON fato.id_veiculo_sk = veic.id_veiculo_sk
+INNER JOIN {{ ref('dim_infrator_dbt') }} AS veic
+    ON fato.id_infrator_sk = veic.id_infrator_sk
 
 GROUP BY
     veic.especie_veiculo,

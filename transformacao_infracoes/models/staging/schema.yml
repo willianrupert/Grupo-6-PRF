@@ -79,13 +79,13 @@ models:
           - relationships:
               to: ref('dim_infracao_dbt')
               field: id_infracao_sk
-      - name: id_veiculo_sk
-        description: Chave surrogate da dimensão veículo.
+      - name: id_infrator_sk
+        description: Chave surrogate da dimensão infrator.
         tests:
           - not_null
           - relationships:
-              to: ref('dim_veiculo_dbt')
-              field: id_veiculo_sk
+              to: ref('dim_infrator_dbt')
+              field: id_infrator_sk
 
   - name: dim_infracao_dbt
     description: >

@@ -1,91 +1,55 @@
 {{ config(materialized='table') }}
 
--- fixação de tipo de dado
-WITH base AS (
-    SELECT DISTINCT 
-        data_infracao::DATE AS data_infracao
-    -- aponta para o modelo onde limpamos os dados das multas
-    FROM {{ ref('int_multas_preparados') }} 
-    WHERE data_infracao IS NOT NULL
+with base as (
+    select distinct 
+        data_infracao::date as data_infracao
+    from {{ ref('int_multas_preparados') }} 
+    where data_infracao is not null
 )
 
-SELECT
-    -- SK sequencial baseada na ordenação da data
-    -- OVER basicamente pega todas as datas de infração distintas da sua CTE base.
-    -- Colocá-las em ordem cronológica (da mais antiga para a mais recente).
-    -- E só depois disso, o ROW_NUMBER() vai passar carimbando o número 1 na primeira data, o número 2 na segunda...
-    ROW_NUMBER() OVER (ORDER BY data_infracao) AS id_tempo_sk,
+select
+    row_number() over (order by data_infracao) as id_tempo_sk,
     data_infracao,
-    CAST(EXTRACT(DAY FROM data_infracao) AS INTEGER) AS dia,
-    CAST(EXTRACT(MONTH FROM data_infracao) AS INTEGER) AS mes,
-    CAST(EXTRACT(YEAR FROM data_infracao) AS INTEGER) AS ano,
-    CAST(EXTRACT(QUARTER FROM data_infracao) AS INTEGER) AS trimestre,
+    cast(extract(day from data_infracao) as integer) as dia,
+    cast(extract(month from data_infracao) as integer) as mes,
+    cast(extract(year from data_infracao) as integer) as ano,
+    cast(extract(quarter from data_infracao) as integer) as trimestre,
     
-    -- mapeamento manual como a gente fez em int_multas_preparados
-    CASE EXTRACT(ISODOW FROM data_infracao)
-        WHEN 1 THEN 'Segunda-feira'
-        WHEN 2 THEN 'Terça-feira'
-        WHEN 3 THEN 'Quarta-feira'
-        WHEN 4 THEN 'Quinta-feira'
-        WHEN 5 THEN 'Sexta-feira'
-        WHEN 6 THEN 'Sábado'
-        WHEN 7 THEN 'Domingo'
-    END AS dia_semana,
+    case extract(isodow from data_infracao)
+        when 1 then 'Segunda-feira'
+        when 2 then 'Terça-feira'
+        when 3 then 'Quarta-feira'
+        when 4 then 'Quinta-feira'
+        when 5 then 'Sexta-feira'
+        when 6 then 'Sábado'
+        when 7 then 'Domingo'
+    end as dia_semana,
 
-    -- LÓGICA DE FERIADOS ADICIONADA: Verifica se é feriado fixo ou móvel (2022 a 2024)
-    CASE 
-        -- Feriados Fixos
-        WHEN EXTRACT(MONTH FROM data_infracao) = 1 AND EXTRACT(DAY FROM data_infracao) = 1 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 21 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 1 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 9 AND EXTRACT(DAY FROM data_infracao) = 7 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 10 AND EXTRACT(DAY FROM data_infracao) = 12 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 2 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 15 THEN TRUE
-        WHEN EXTRACT(MONTH FROM data_infracao) = 12 AND EXTRACT(DAY FROM data_infracao) = 25 THEN TRUE
+    case 
+        -- Feriados Fixos Brasileiros
+        when extract(month from data_infracao) = 1 and extract(day from data_infracao) = 1 then true
+        when extract(month from data_infracao) = 4 and extract(day from data_infracao) = 21 then true
+        when extract(month from data_infracao) = 5 and extract(day from data_infracao) = 1 then true
+        when extract(month from data_infracao) = 9 and extract(day from data_infracao) = 7 then true
+        when extract(month from data_infracao) = 10 and extract(day from data_infracao) = 12 then true
+        when extract(month from data_infracao) = 11 and extract(day from data_infracao) = 2 then true
+        when extract(month from data_infracao) = 11 and extract(day from data_infracao) = 15 then true
+        when extract(month from data_infracao) = 12 and extract(day from data_infracao) = 25 then true
         -- Feriados Móveis 2022
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 1 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 15 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 17 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 16 THEN TRUE
+        when extract(year from data_infracao) = 2022 and extract(month from data_infracao) = 3 and extract(day from data_infracao) = 1 then true
+        when extract(year from data_infracao) = 2022 and extract(month from data_infracao) = 4 and extract(day from data_infracao) = 15 then true
+        when extract(year from data_infracao) = 2022 and extract(month from data_infracao) = 4 and extract(day from data_infracao) = 17 then true
+        when extract(year from data_infracao) = 2022 and extract(month from data_infracao) = 6 and extract(day from data_infracao) = 16 then true
         -- Feriados Móveis 2023
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 21 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 7 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 9 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 8 THEN TRUE
+        when extract(year from data_infracao) = 2023 and extract(month from data_infracao) = 2 and extract(day from data_infracao) = 21 then true
+        when extract(year from data_infracao) = 2023 and extract(month from data_infracao) = 4 and extract(day from data_infracao) = 7 then true
+        when extract(year from data_infracao) = 2023 and extract(month from data_infracao) = 4 and extract(day from data_infracao) = 9 then true
+        when extract(year from data_infracao) = 2023 and extract(month from data_infracao) = 6 and extract(day from data_infracao) = 8 then true
         -- Feriados Móveis 2024
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 13 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 29 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 31 THEN TRUE
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 30 THEN TRUE
-        ELSE FALSE
-    END AS is_feriado,
-
-    CASE 
-        -- Feriados Fixos
-        WHEN EXTRACT(MONTH FROM data_infracao) = 1 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Confraternização Universal'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 21 THEN 'Tiradentes'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Dia do Trabalhador'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 9 AND EXTRACT(DAY FROM data_infracao) = 7 THEN 'Independência do Brasil'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 10 AND EXTRACT(DAY FROM data_infracao) = 12 THEN 'Nossa Senhora Aparecida'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 2 THEN 'Finados'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 11 AND EXTRACT(DAY FROM data_infracao) = 15 THEN 'Proclamação da República'
-        WHEN EXTRACT(MONTH FROM data_infracao) = 12 AND EXTRACT(DAY FROM data_infracao) = 25 THEN 'Natal'
-        -- Feriados Móveis 2022
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 1 THEN 'Carnaval'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 15 THEN 'Sexta-feira Santa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 17 THEN 'Páscoa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2022 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 16 THEN 'Corpus Christi'
-        -- Feriados Móveis 2023
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 21 THEN 'Carnaval'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 7 THEN 'Sexta-feira Santa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 4 AND EXTRACT(DAY FROM data_infracao) = 9 THEN 'Páscoa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2023 AND EXTRACT(MONTH FROM data_infracao) = 6 AND EXTRACT(DAY FROM data_infracao) = 8 THEN 'Corpus Christi'
-        -- Feriados Móveis 2024
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 2 AND EXTRACT(DAY FROM data_infracao) = 13 THEN 'Carnaval'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 29 THEN 'Sexta-feira Santa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 3 AND EXTRACT(DAY FROM data_infracao) = 31 THEN 'Páscoa'
-        WHEN EXTRACT(YEAR FROM data_infracao) = 2024 AND EXTRACT(MONTH FROM data_infracao) = 5 AND EXTRACT(DAY FROM data_infracao) = 30 THEN 'Corpus Christi'
-        ELSE 'Não Feriado'
-    END AS nome_feriado
-FROM base
+        when extract(year from data_infracao) = 2024 and extract(month from data_infracao) = 2 and extract(day from data_infracao) = 13 then true
+        when extract(year from data_infracao) = 2024 and extract(month from data_infracao) = 3 and extract(day from data_infracao) = 29 then true
+        when extract(year from data_infracao) = 2024 and extract(month from data_infracao) = 3 and extract(day from data_infracao) = 31 then true
+        when extract(year from data_infracao) = 2024 and extract(month from data_infracao) = 5 and extract(day from data_infracao) = 30 then true
+        else false
+    end as is_feriado
+from base

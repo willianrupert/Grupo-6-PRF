@@ -8,7 +8,6 @@
 SELECT
     tempo.is_feriado,
     tempo.dia_semana,
-    inf.gravidade,
 
     COUNT(fato.numero_auto)                                          AS total_multas,
 
@@ -24,7 +23,6 @@ INNER JOIN {{ ref('dim_infracao_dbt') }} AS inf
 GROUP BY
     tempo.is_feriado,
     tempo.dia_semana,
-    inf.gravidade
 
 ORDER BY
     tempo.is_feriado DESC,

@@ -1,52 +1,49 @@
 {{ config(materialized='view') }}
 
-WITH source AS (
-    -- Puxa os dados da tabela intermediária já limpa
-    SELECT * FROM {{ ref('int_multas_preparados') }}
+with source as (
+    select * from {{ ref('int_multas_preparados') }}
 ),
 
-fato AS (
-    SELECT
-        -- Chaves Estrangeiras (Ligando o miolo às pontas da estrela)
+fato as (
+    select
+        -- Surrogate Keys (Relacionamentos Estrela)
         t.id_tempo_sk,
-        l.id_localidade_sk,
+        l.id_localizacao_sk,
         inf.id_infracao_sk,
-        v.id_veiculo_sk,
+        inf_sk.id_infrator_sk,
 
-        -- Chave do Fato (O identificador único da multa)
+
+        -- Chave e Métricas da Fato
         s.numero_auto,
-
-        -- Fatos e Medidas (Os números e características que sobraram para análise)
-        s.hora_infracao,
         s.qtd_infracoes,
         s.medicao_considerada,
         s.excesso_verificado,
+        s.indicador_abordagem,
         s.assinatura_auto,
         s.sentido_trafego
+    from source s
 
-    FROM source s
+    left join {{ ref('dim_tempo_dbt') }} t
+        on s.data_infracao = t.data_infracao
 
-    -- Cruzamento com a Dimensão Tempo
-    LEFT JOIN {{ ref('dim_tempo_dbt') }} t
-        ON s.data_infracao = t.data_infracao
+    left join {{ ref('dim_localizacao_dbt') }} l
+        on s.uf_infracao = l.uf_infracao
+        and s.br_infracao = l.br_infracao
+        and s.km_infracao = l.km_infracao
+        and s.municipio = l.municipio
+        and s.regiao_infracao = l.regiao_infracao
+        and s.sentido_trafego = l.sentido_trafego
 
-    -- Cruzamento com a Dimensão Localizacao (usando os nomes do arquivo dele)
-    LEFT JOIN {{ ref('dim_localizacao_dbt') }} l
-        ON s.municipio = l.municipio
-        AND s.uf_infracao = l.uf
+    left join {{ ref('dim_infracao_dbt') }} inf
+        on s.codigo_infracao = inf.codigo_infracao
 
-    -- Cruzamento com a Dimensão Infracao
-    LEFT JOIN {{ ref('dim_infracao_dbt') }} inf
-        ON s.codigo_infracao = inf.codigo_infracao
-
-    -- Cruzamento com a Dimensão Veiculo (cruzando todas as propriedades do carro e da abordagem)
-    LEFT JOIN {{ ref('dim_veiculo_dbt') }} v
-        ON s.descricao_especie_veiculo = v.especie_veiculo
-        AND s.descricao_tipo_veiculo = v.tipo_veiculo
-        AND s.descricao_marca_veiculo = v.marca_veiculo
-        AND s.descricao_modelo_veiculo = v.modelo_veiculo
-        AND s.indicador_veiculo_estrangeiro = v.indicador_veiculo_estrangeiro
-        AND s.uf_placa = v.uf_placa
+    left join {{ ref('dim_infrator_dbt') }} inf_sk
+        on s.indicador_veiculo_estrangeiro = inf_sk.indicador_veiculo_estrangeiro
+        and s.uf_placa = inf_sk.uf_placa
+        and s.descricao_especie_veiculo = inf_sk.descricao_especie_veiculo
+        and s.descricao_marca_veiculo = inf_sk.descricao_marca_veiculo
+        and s.descricao_tipo_veiculo = inf_sk.descricao_tipo_veiculo
+        and s.descricao_modelo_veiculo = inf_sk.descricao_modelo_veiculo
 )
 
-SELECT * FROM fato
+select * from fato

@@ -5,7 +5,10 @@
 }}
 
 with stg_multas as (
-    select * from {{ ref('stg_multas_unificados') }}
+    -- Adicionando um distinct para garantir que não haja duplicatas da carga bruta
+    select distinct
+        * 
+    from {{ ref('stg_multas_unificados') }}
 ),
 
 normalizacao_estrangeiro_e_nulos as (
@@ -33,12 +36,13 @@ normalizacao_placa as (
     select
         *,
         case
+            -- Normalização da UF da placa
             when uf_placa in ('AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
                             'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
                             'SP', 'SE', 'TO') then uf_placa
             when uf_placa in ('N/I', 'EX') then uf_placa
             when uf_placa = '/' then 'N/I'
-            when uf_placa in ('-1', '''-1''', '', '/') then 'N/I'
+            when uf_placa in ('-1', '''-1', '', '/') then 'N/I'
             when length(uf_placa) = 2 and uf_placa similar to '%[0-9]%' then 'EX'
             else 'N/I'
         end as uf_placa_normalizada
@@ -72,38 +76,38 @@ conversao_tipos as (
         estrangeiro_normalizado as indicador_veiculo_estrangeiro,
         uf_placa_normalizada as uf_placa,
         
-        -- Funções clean_especie_veiculo e clean_tipo_veiculo em lote SQL (Corrigidas as vírgulas)
+        -- Funções clean_especie_veiculo e clean_tipo_veiculo em lote SQL 
         CASE 
-            -- 1. Se for nulo ou vazio, limpa direto
+            -- se for nulo ou vazio, limpa direto
             WHEN especie_limpa IS NULL OR TRIM(especie_limpa) = '' THEN 'Não Informado'
             
-            -- 2. Intercepta os valores fantasmas (Lógica da subfunção)
-            WHEN UPPER(TRIM(especie_limpa)) IN ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1''', 'NÃO INFORMADO', 'N/I') THEN 'NÃO INFORMADO'
+            -- intercepta os valores fantasmas (Lógica da subfunção)
+            WHEN UPPER(TRIM(especie_limpa)) IN ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1', 'NÃO INFORMADO', 'N/I') THEN 'NÃO INFORMADO'
             
-            -- 3. Mapeia estritamente TRAÇÃO (com e sem acento)
+            -- mapeia estritamente TRAÇÃO (com e sem acento)
             WHEN UPPER(TRIM(especie_limpa)) IN ('TRACAO', 'TRAÇÃO') THEN 'TRAÇÃO'
             
-            -- 4. Mapeia estritamente COLEÇÃO (com e sem acento)
+            -- mapeia estritamente COLEÇÃO (com e sem acento)
             WHEN UPPER(TRIM(especie_limpa)) IN ('COLECAO', 'COLEÇÃO') THEN 'COLEÇÃO'
             
-            -- 5. Mapeia estritamente COMPETIÇÃO (com e sem acento)
+            -- mapeia estritamente COMPETIÇÃO (com e sem acento)
             WHEN UPPER(TRIM(especie_limpa)) IN ('COMPETICAO', 'COMPETIÇÃO') THEN 'COMPETIÇÃO'
             
-            -- 6. Mantém os demais termos válidos garantindo que fiquem em caixa alta padrão
+            -- mantém os demais termos válidos garantindo que fiquem em caixa alta padrão
             WHEN UPPER(TRIM(especie_limpa)) IN ('PASSAGEIRO', 'CARGA', 'ESPECIAL', 'MISTO', 'CORRIDA') THEN UPPER(TRIM(especie_limpa))
             
-            -- 7. Caso o dado original seja um texto válido que não mapeamos acima, mantém o texto original limpo ao invés de descartar tudo
+            -- caso o dado original seja um texto válido que não mapeamos acima, mantém o texto original limpo ao invés de descartar tudo
             ELSE COALESCE(UPPER(TRIM(especie_limpa)), 'Não Informado')
         END AS descricao_especie_veiculo,
 
         case 
-            when upper(trim(tipo_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1''', 'NÃO INFORMADO') then 'NÃO INFORMADO'
+            when upper(trim(tipo_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1', 'NÃO INFORMADO') then 'NÃO INFORMADO'
             else upper(trim(tipo_limpa))
         end as descricao_tipo_veiculo,
 
-        -- Função clean_marca_veiculo em lote SQL unificada (removida a duplicata de baixo)
+        -- Função clean_marca_veiculo em lote SQL unificada
         case 
-            when upper(trim(marca_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1''', 'Não INFORMADO') then 'NÃO INFORMADO'
+            when upper(trim(marca_limpa)) in ('NAO INFORMADO', 'NÃO ENCONTRADO', 'NA', '-1', '''-1', 'Não INFORMADO') then 'NÃO INFORMADO'
             else upper(trim(marca_limpa))
         end as descricao_marca_veiculo,
 
@@ -111,6 +115,7 @@ conversao_tipos as (
         descricao_infracao_limpa as descricao_abreviada_infracao,
         enquadramento_limpo as enquadramento_infracao,
         
+        -- Conversão de tipos para os campos numéricos
         cast(case when coalesce(codigo_infracao, '0') ~ '^-?[0-9]+$' then coalesce(codigo_infracao, '0') else '0' end as integer) as codigo_infracao,
         cast(case when coalesce(km_infracao, '0') ~ '^-?[0-9]+$' then coalesce(km_infracao, '0') else '0' end as integer) as km_infracao,
         cast(case when coalesce(qtd_infracoes, '1') ~ '^-?[0-9]+$' then coalesce(qtd_infracoes, '1') else '1' end as integer) as qtd_infracoes,
@@ -131,6 +136,7 @@ derivacao_tempo_e_regiao as (
         extract(year from data_infracao) as ano,
         extract(quarter from data_infracao) as trimestre,
         
+        -- Deriva o dia da semana
         case extract(isodow from data_infracao)
             when 1 then 'Segunda-feira'
             when 2 then 'Terça-feira'

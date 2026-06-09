@@ -1,10 +1,10 @@
--- view pq é mais eficiente
+-- Materializado como table para evitar re-scan dos 89M rows da raw_multas
+-- a cada model que referenciar este intermediário (dim_veiculo, dim_tempo, fato_multa, etc.)
 {{
     config(
-        materialized='view'
+        materialized='table'
     )
 }}
-
 -- nosso modelo de staging
 with stg_multas AS (
         SELECT * FROM {{ ref('stg_multas_unificados') }}
@@ -86,15 +86,26 @@ conversao_tipos AS (
         COALESCE(medicao_infracao, 'N/I') AS medicao_infracao, -- mantido como VARCHAR/Texto por segurança ("Alcoolemia", etc.)
 
         -- OBS: CAST é uma função[SQL] utilizada para converter o tipo de dado de uma coluna ou valor em outro tipo
-        -- preenchendo nulos com 0
+        -- Usa regex para filtrar qualquer valor não-numérico ('NA', 'N/I', etc.) antes do CAST
         -- inteiros puros
-        CAST(COALESCE(km_infracao, '0') AS INTEGER) AS km_infracao,
-        CAST(COALESCE(qtd_infracoes, '1') AS INTEGER) AS qtd_infracoes, 
-        CAST(hora_infracao AS INTEGER) AS hora_infracao,
+        CAST(CASE WHEN COALESCE(km_infracao, '0') ~ '^-?[0-9]+$'
+                  THEN COALESCE(km_infracao, '0') ELSE '0' END AS INTEGER) AS km_infracao,
+        CAST(CASE WHEN COALESCE(qtd_infracoes, '1') ~ '^-?[0-9]+$'
+                  THEN COALESCE(qtd_infracoes, '1') ELSE '1' END AS INTEGER) AS qtd_infracoes,
+        CAST(CASE WHEN COALESCE(hora_infracao::TEXT, '0') ~ '^-?[0-9]+$'
+                  THEN hora_infracao::TEXT ELSE '0' END AS INTEGER) AS hora_infracao,
 
         -- substituição da vírgula por ponto antes do CAST para FLOAT/NUMERIC
-        CAST(REPLACE(COALESCE(medicao_considerada, '0'), ',', '.') AS NUMERIC(10,2)) AS medicao_considerada,
-        CAST(REPLACE(COALESCE(excesso_verificado, '0'), ',', '.') AS NUMERIC(10,2)) AS excesso_verificado,
+        CAST(
+            CASE WHEN REPLACE(COALESCE(medicao_considerada, '0'), ',', '.') ~ '^-?[0-9]*\.?[0-9]+$'
+                 THEN REPLACE(COALESCE(medicao_considerada, '0'), ',', '.')
+                 ELSE '0' END
+        AS NUMERIC(10,2)) AS medicao_considerada,
+        CAST(
+            CASE WHEN REPLACE(COALESCE(excesso_verificado, '0'), ',', '.') ~ '^-?[0-9]*\.?[0-9]+$'
+                 THEN REPLACE(COALESCE(excesso_verificado, '0'), ',', '.')
+                 ELSE '0' END
+        AS NUMERIC(10,2)) AS excesso_verificado,
 
         -- Implementação de limpeza rigorosa de dados com regex (~ '^\d{4}-\d{2}-\d{2}$') para converter datas, 
         -- tratando casos como "N/I" e evitando erros de tipo (CAST).
